@@ -2,6 +2,7 @@ spring:
   batch:
     job:
       names: ${job.name} # 실행하려는 Job의 이름을 파라미터로 넘겨주어야함
+      enabled: false # 실행 안함, 스케쥴링으로 실행하려면 false로!
     jdbc:
       initialize-schema: always
   datasource:
