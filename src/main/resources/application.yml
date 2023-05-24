@@ -1,1 +1,13 @@
-
+spring:
+  batch:
+    job:
+      names: ${job.name} # Job 이름을 파라미터로 넘겨주어야함
+    jdbc:
+      initialize-schema: always
+  datasource:
+    url: jdbc:mysql://localhost:3306/spring_batch?createDatabaseIfNotExist=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
+  jpa:
+    show-sql: true
