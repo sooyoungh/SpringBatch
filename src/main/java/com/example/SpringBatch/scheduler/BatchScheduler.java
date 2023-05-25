@@ -18,7 +18,7 @@ import java.util.Collections;
 public class BatchScheduler {
 
     @Autowired
-    private Job helloWorldJob;
+    private Job trMigrationJob;
 
     @Autowired
     private JobLauncher jobLauncher;
@@ -30,6 +30,6 @@ public class BatchScheduler {
                 Collections.singletonMap("requestTime", new JobParameter(System.currentTimeMillis())) // 파라미터값이 매초마다 변경해주기
         );
 
-        jobLauncher.run(helloWorldJob, jobParameters);  // 만약 파라미터가 계속 값은 값이면, Spring은 새로 실행 X
+        jobLauncher.run(trMigrationJob, jobParameters);  // 만약 파라미터가 계속 값은 값이면, Spring은 새로 실행 X
     }
 }
