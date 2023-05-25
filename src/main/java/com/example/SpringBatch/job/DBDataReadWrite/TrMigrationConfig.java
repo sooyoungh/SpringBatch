@@ -1,10 +1,10 @@
 package com.example.SpringBatch.job.DBDataReadWrite;
 
+import com.example.SpringBatch.domain.accounts.Accounts;
 import com.example.SpringBatch.domain.accounts.AccountsRepository;
 import com.example.SpringBatch.domain.orders.Orders;
 import com.example.SpringBatch.domain.orders.OrdersRepository;
 import lombok.RequiredArgsConstructor;
-import net.bytebuddy.TypeCache;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -12,10 +12,13 @@ import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.RepositoryItemReader;
+import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
+import org.springframework.batch.item.data.builder.RepositoryItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +26,6 @@ import org.springframework.data.domain.Sort;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * desc: DB 데이터 마이그레이션
@@ -56,17 +58,36 @@ public class TrMigrationConfig {
 
     @JobScope   // Job 하위
     @Bean
-    public Step trMigrationStep(ItemReader trOrdersReader) {
+    public Step trMigrationStep(
+            ItemReader trOrdersReader,
+            ItemProcessor trOrderProcessor,
+            ItemWriter trOrdersWriter) {
         return stepBuilderFactory.get("trMigrationStep")
-                .<Orders, Orders>chunk(5)
+                .<Orders, Accounts>chunk(5)
                 .reader(trOrdersReader)
-                .writer(new ItemWriter() {
-                    @Override
-                    public void write(List items) throws Exception {
-                        items.forEach(System.out::println);
-                    }
-                })
+                .processor(trOrderProcessor)
+                .writer(trOrdersWriter)
                 .build();
+    }
+
+    @StepScope
+    @Bean
+    public RepositoryItemWriter<Accounts> trOrdersWriter() {
+        return new RepositoryItemWriterBuilder<Accounts>()
+                .repository(accountsRepository)
+                .methodName("save")
+                .build();
+    }
+
+    @StepScope
+    @Bean
+    public ItemProcessor<Orders, Accounts> trOrderProcessor () {
+        return new ItemProcessor<Orders, Accounts>() {
+            @Override
+            public Accounts process(Orders item) throws Exception {
+                return new Accounts(item);
+            }
+        };
     }
 
     @StepScope
