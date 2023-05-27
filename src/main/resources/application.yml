@@ -12,3 +12,5 @@ spring:
     password: ${LOCAL_DB_PASSWORD}
   jpa:
     show-sql: true
+    hibernate:
+      ddl-auto: create

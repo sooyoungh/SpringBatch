@@ -18,18 +18,18 @@ import java.util.Collections;
 public class BatchScheduler {
 
     @Autowired
-    private Job trMigrationJob;
+    private Job cuEventCrawl;
 
     @Autowired
     private JobLauncher jobLauncher;
 
-    @Scheduled(cron = "*/1 * * * * *") // 매초, 분 시 날짜 달 요일
+    @Scheduled(cron = "* * */1 * * *") // 매초, 분 시 날짜 달 요일
     public void helloWorldJobRun() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
 
         JobParameters jobParameters = new JobParameters(
                 Collections.singletonMap("requestTime", new JobParameter(System.currentTimeMillis())) // 파라미터값이 매초마다 변경해주기
         );
 
-        jobLauncher.run(trMigrationJob, jobParameters);  // 만약 파라미터가 계속 값은 값이면, Spring은 새로 실행 X
+        jobLauncher.run(cuEventCrawl, jobParameters);  // 만약 파라미터가 계속 값은 값이면, Spring은 새로 실행 X
     }
 }
